@@ -19,28 +19,59 @@ function complet_realizat() {
     if (conf) conf.click();
 }
 
-function parcurgere(){
-    
+function nextElev() {
+    let bNext = document.getElementById('ElevTest2015ListForm:nextButton');
+    bNext.click();
+}
+
+function parcurgere_elevi(firstCNP) {
+    let currCNP = document.getElementById('ElevTest2015ListForm:cnp').innerText;
+    console.log("Curent: " + currCNP); // do smth with this student
+
+    //Check if already completed
+    let collection = document.getElementsByClassName("ui-cell-editor-input");
+    if(collection) if(collection[0]) if(collection[0].firstChild) { // verific daca deja a fost completat
+        //if(collection[collection.length-1].firstChild.selectedIndex == 1) 
+        {
+            console.log("Verifica de aici!");
+            if (currCNP != firstCNP) {
+                setTimeout(reapelare, 2000, firstCNP);
+            }
+            else {
+                console.log("Am terminat");
+            }
+            return;
+        }
+    }
+
+    press_start();
+    setTimeout(complet_realizat, 2000);
+    if (currCNP != firstCNP) {
+        setTimeout(reapelare, 25000, firstCNP);
+    }
+    else {
+        console.log("Am terminat");
+    }
+}
+
+function reapelare(firstCNP){
+    nextElev();
+    setTimeout(parcurgere_elevi, 2000, firstCNP);
 }
 
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
-        if (request.method == "changePage") {
-            /*let subiecte = document.getElementById('ElevTest2015ListForm:test_input');
-            let sub = [ 1];//,15,16,20,21,22,23,25 ];
-            for(let k = 0; k < sub.length; k++)*/
-            //TODO: sa ciclez prin toate materiile, stiind indecsii (vector cu indecsi)
-            {
-                /*
-                subiecte.click();
-                subiecte.selectedIndex = sub[k];
-                console.log(subiecte.value);
-                subiecte.click();*/
+        if (request.method == "realizatCont") {
+            let firstCNP = document.getElementById('ElevTest2015ListForm:cnp').innerText;
+            console.log("Primul: " + firstCNP);
 
-                press_start();
-                setTimeout(complet_realizat, 2000);
-
-            }
+            nextElev();
+            setTimeout(parcurgere_elevi, 2000, firstCNP);
+            
+        }
+        else if(request.method == "realizatUnu"){
+            press_start();
+            setTimeout(complet_realizat, 2000);
         }
     }
 );
